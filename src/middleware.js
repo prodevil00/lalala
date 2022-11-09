@@ -5,7 +5,7 @@ export async function middleware(req, ev) {
     const url = req.nextUrl.clone()
     
 
-    const data = await fetch(url.host+"/api/allpost").then(res => res.json())
+    const data = await fetch(url.origin+"/api/allpost").then(res => res.json())
     const randompost = random(data.posts.nodes);
     // const { pathname } = req.nextUrl
     const referer = req.headers.get('referer') || "";
