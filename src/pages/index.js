@@ -19,8 +19,6 @@ export default function Home({ page, posts }) {
 
       <main className={styles.main}>
         <h1 className={styles.title}>{title}</h1>
-        <a href='http://localhost:3000/post/lions-mother-scolded-the-cub-when-the-father-tried-to-punish-him-for-biting-his-tail?cnt=4714?fbclid=3'>FJDF</a>
-
         <p className={styles.description}>{ description }</p>
 
         <ul className={styles.grid}>
