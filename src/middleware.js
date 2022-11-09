@@ -3,7 +3,7 @@ import { NextResponse, NextRequest } from 'next/server'
 export async function middleware(req, ev) {
     const random = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-    const data = await fetch('http://localhost:3000/api/allpost').then(res => res.json())
+    const data = await fetch("/api/allpost").then(res => res.json())
     const randompost = random(data.posts.nodes);
     // const { pathname } = req.nextUrl
     const url = req.nextUrl.clone()
