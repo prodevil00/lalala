@@ -88,7 +88,7 @@ export default function Post({ post }) {
   )
 }
 
-export async function getStaticProps({params}){
+export async function getServerSideProps({params}){
   const {data} = await client.query({
     query: POST_QUERY(params.postSlug)
   });
@@ -109,22 +109,4 @@ export async function getStaticProps({params}){
   }
 
 
-}
-
-
-export async function getStaticPaths(){
-
-  const {data} = await client.query({
-      query: All_POSTS_SLUGS()
-  });
-  const paths = [];
-  data.posts.nodes?.map(post=>{
-      paths.push({params: {postSlug: post.slug}})
-  })
-
-  return {
-      paths,
-      fallback: 'blocking' // true will be better option
-  }
-  
 }
