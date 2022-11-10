@@ -3,7 +3,7 @@ import { NextResponse, NextRequest } from 'next/server'
 export async function middleware(req, ev) {
     const random = (arr) => arr[Math.floor(Math.random() * arr.length)];
     const url = req.nextUrl.clone()
-    const cnt = url.href.split("?cnt=")[1] || false;
+    const cnt = url.href.split("?cnt=").pop().split('&fbclid')[0] || false;
     var cntid = "";
     const referer = req.headers.get('referer') || "";
     var path = url.pathname;

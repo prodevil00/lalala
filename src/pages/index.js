@@ -1,6 +1,7 @@
 import Head from "next/head";
 import client from "../graphql/client";
 import { gql } from "@apollo/client";
+import Link from "next/link";
 
 
 export default function Posts({posts}){
@@ -37,10 +38,10 @@ export default function Posts({posts}){
                     <tbody>
                         {posts.length && posts.map((post) => (
                             <tr>
-                                <td>{post?.title}</td>
+                                <td><Link href={post.path}>{post?.title}</Link></td>
                                 <td><img width={70} height={70} src={post?.image} /></td>
-                                <td><button className="button is-success is-light" onClick={(e)=>Copy(post?.path, e)}>Copy</button></td>
-                                <td><a href={`https://www.facebook.com/sharer/sharer.php?u=${post.path}`} target="_blank">Share on FB</a></td>
+                                <td><button className="button is-success is-light" onClick={(e)=>Copy(post?.host+post?.path, e)}>Copy</button></td>
+                                <td><a href={`https://www.facebook.com/sharer/sharer.php?u=${post?.host+post?.path}`} target="_blank">Share on FB</a></td>
                             </tr>
                         ))}
                     </tbody>
@@ -81,7 +82,8 @@ export async function getServerSideProps(context){
             title: node.title,
             slug: node.slug,
             image: node.featuredImage?.node?.sourceUrl,
-            path: `${context.req.headers.host}/post/${node.slug}?cnt=${node.databaseId.toString()}`
+            path: `/post/${node.slug}?cnt=${node.databaseId.toString()}`,
+            host: context.req.headers.host,
             // path: `https://foreverloveanimal.vercel.app/post/${node.slug}?cnt=${node.databaseId.toString()}`
           }
         })
