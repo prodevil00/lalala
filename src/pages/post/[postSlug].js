@@ -3,7 +3,7 @@ import Link from 'next/link'
 import styles from '../../styles/Home.module.css'
 
 //Query
-import {All_POSTS_SLUGS, POST_QUERY} from "../../graphql/_post";
+import {POST_QUERY} from "../../graphql/_post";
 import client from "../../graphql/client";
 
 

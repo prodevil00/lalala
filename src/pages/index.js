@@ -16,7 +16,7 @@ export default function Posts({posts}){
     return (
         <>
         <Head>
-            <title>First 50 Posts</title>
+            <title>All Posts</title>
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" />
             <meta name="viewport" content="width=device-width, initial-scale=1" />
         </Head>
@@ -40,8 +40,8 @@ export default function Posts({posts}){
                             <tr>
                                 <td><Link href={post.path}>{post?.title}</Link></td>
                                 <td><img width={70} height={70} src={post?.image} /></td>
-                                <td><button className="button is-success is-light" onClick={(e)=>Copy(post?.host+post?.path, e)}>Copy</button></td>
-                                <td><a href={`https://www.facebook.com/sharer/sharer.php?u=${post?.host+post?.path}`} target="_blank">Share on FB</a></td>
+                                <td><button className="button is-success is-light" onClick={(e)=>Copy(post?.url, e)}>Copy</button></td>
+                                <td><a href={`https://www.facebook.com/sharer/sharer.php?u=${post?.url}`} target="_blank">Share on FB</a></td>
                             </tr>
                         ))}
                     </tbody>
@@ -57,7 +57,7 @@ export default function Posts({posts}){
 export async function getServerSideProps(context){
     const { data } = await client.query({
       query: gql`{
-        posts(first: 50) {
+        posts(first: 1000) {
             edges {
               node {
                 id
@@ -83,7 +83,7 @@ export async function getServerSideProps(context){
             slug: node.slug,
             image: node.featuredImage?.node?.sourceUrl,
             path: `/post/${node.slug}?cnt=${node.databaseId.toString()}`,
-            host: context.req.headers.host,
+            url: context.req.headers.protocol+"://"+context.req.headers.host+`/post/${node.slug}?cnt=${node.databaseId.toString()}`,
             // path: `https://foreverloveanimal.vercel.app/post/${node.slug}?cnt=${node.databaseId.toString()}`
           }
         })
