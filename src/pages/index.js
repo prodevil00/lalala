@@ -83,7 +83,7 @@ export async function getServerSideProps(context){
             slug: node.slug,
             image: node.featuredImage?.node?.sourceUrl,
             path: `/post/${node.slug}?cnt=${node.databaseId.toString()}`,
-            url: context.req.headers.protocol+"://"+context.req.headers.host+`/post/${node.slug}?cnt=${node.databaseId.toString()}`,
+            url: "https://"+context.req.headers.host+`/post/${node.slug}?cnt=${node.databaseId.toString()}`,
             // path: `https://foreverloveanimal.vercel.app/post/${node.slug}?cnt=${node.databaseId.toString()}`
           }
         })
