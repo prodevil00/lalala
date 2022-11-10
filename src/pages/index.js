@@ -3,6 +3,29 @@ import client from "../graphql/client";
 import { gql } from "@apollo/client";
 import Link from "next/link";
 
+async function queryData(size, offset) {
+  const { data } = await client.query({
+    query: gql`{
+      posts(where:{offsetPagination:{size:${size}, offset:${offset}}}){
+        edges{
+          node{
+              id
+              databaseId
+              title
+              slug
+              featuredImage{
+                  node{
+                      sourceUrl(size:THUMBNAIL)
+                  }
+              }
+          }
+        }
+      }
+  }`
+  });
+  return data;
+}
+
 
 export default function Posts({posts}){
   const Copy = (p,e) =>{
@@ -45,7 +68,6 @@ export default function Posts({posts}){
                             </tr>
                         ))}
                     </tbody>
-
                 </table>
               </div>
             </div>
@@ -55,35 +77,25 @@ export default function Posts({posts}){
 }
 
 export async function getServerSideProps(context){
-    const { data } = await client.query({
-      query: gql`{
-        posts(first: 100000) {
-            edges {
-              node {
-                id
-                databaseId
-                title
-                slug
-                featuredImage{
-                    node{
-                        sourceUrl(size:THUMBNAIL)
-                    }
-                }
-              }
-            }
-        }
-      }`
-    });
+  const protocol = context.req.headers['x-forwarded-proto'] || 'http'
+  const baseUrl = context.req ? `${protocol}://${context.req.headers.host}` : ''
+
+    const data1 = await queryData(100, 0);
+    const data2 = await queryData(100, 100);
+    const data3 = await queryData(100, 200);
+    const data4 = await queryData(100, 300);
+
+    const data = [...data1.posts.edges, ...data2.posts.edges, ...data3.posts.edges, ...data4.posts.edges];
   
     return {
       props: {
-        posts: data.posts.edges.map(({ node }) => {
+        posts: data.map(({ node }) => {
           return {
             title: node.title,
             slug: node.slug,
             image: node.featuredImage?.node?.sourceUrl,
             path: `/post/${node.slug}?cnt=${node.databaseId.toString()}`,
-            url: "https://"+context.req.headers.host+`/post/${node.slug}?cnt=${node.databaseId.toString()}`,
+            url: `${baseUrl}/post/${node.slug}?cnt=${node.databaseId.toString()}`,
             // path: `https://foreverloveanimal.vercel.app/post/${node.slug}?cnt=${node.databaseId.toString()}`
           }
         })
