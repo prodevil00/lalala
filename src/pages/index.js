@@ -1,75 +1,90 @@
-import Head from 'next/head'
-import Link from 'next/link'
-import styles from '../styles/Home.module.css'
-
-//Query
-import HOME_QUERY from "../graphql/_home";
+import Head from "next/head";
 import client from "../graphql/client";
+import { gql } from "@apollo/client";
 
 
-export default function Home({ page, posts }) {
-  const { title, description } = page;
-  return (
-    <div className={styles.container}>
-      <Head>
-        <title>{title}</title>
-        <meta name="description" content={description} />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+export default function Posts({posts}){
+  const Copy = (p,e) =>{
+    navigator.clipboard.writeText(p).then(()=>{
+      e.target.innerHTML = "Copied";
+      setTimeout(()=>{
+        e.target.innerHTML = "Copy";
+      },1000);
+    })
+  }
+    return (
+        <>
+        <Head>
+            <title>First 50 Posts</title>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+        </Head>
+        <section className="section">
+            <div className="container">
+              <h1 className="title">
+                Posts
+              </h1>
+              <div className="card">
+                <table className="table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Featured Image</th>
+                            <th>Copy url</th>
+                            <th>Share on FB</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {posts.length && posts.map((post) => (
+                            <tr>
+                                <td>{post?.title}</td>
+                                <td><img width={70} height={70} src={post?.image} /></td>
+                                <td><button className="button is-success is-light" onClick={(e)=>Copy(post?.path, e)}>Copy</button></td>
+                                <td><a href={`https://www.facebook.com/sharer/sharer.php?u=${post.path}`} target="_blank">Share on FB</a></td>
+                            </tr>
+                        ))}
+                    </tbody>
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>{title}</h1>
-        <a href='http://localhost:3000/post/lions-mother-scolded-the-cub-when-the-father-tried-to-punish-him-for-biting-his-tail?cnt=4714?fbclid=3'>FJDF</a>
-
-        <p className={styles.description}>{ description }</p>
-
-        <ul className={styles.grid}>
-          {posts && posts.length > 0 && posts.map(post => {
-            return (
-              <li key={post.slug} className={styles.card}>
-                <Link href={post.path}>
-                  <a>
-                    <h3 dangerouslySetInnerHTML={{
-                      __html: post.title
-                    }} />
-                  </a>
-                </Link>
-                <div dangerouslySetInnerHTML={{
-                  __html: post.excerpt
-                }} />
-              </li>
-            );
-          })}
-
-          {!posts || posts.length === 0 && (
-            <li>
-              <p>
-                Oops, no posts found!
-              </p>
-            </li>
-          )}
-        </ul>
-      </main>
-    </div>
-  )
+                </table>
+              </div>
+            </div>
+        </section>
+        </>
+    )
 }
 
-export async function getStaticProps(){
-  const { data } = await client.query({
-    query: HOME_QUERY
-  });
-
-  return {
-    props: {
-      page: data.generalSettings,
-      posts: data.posts.edges.map(({ node }) => {
-        return {
-          title: node.title,
-          excerpt: node.excerpt,
-          slug: node.slug,
-          path: `/post/${node.slug}?cnt=${node.databaseId.toString()}`
+export async function getServerSideProps(context){
+    const { data } = await client.query({
+      query: gql`{
+        posts(first: 50) {
+            edges {
+              node {
+                id
+                databaseId
+                title
+                slug
+                featuredImage{
+                    node{
+                        sourceUrl(size:THUMBNAIL)
+                    }
+                }
+              }
+            }
         }
-      })
+      }`
+    });
+  
+    return {
+      props: {
+        posts: data.posts.edges.map(({ node }) => {
+          return {
+            title: node.title,
+            slug: node.slug,
+            image: node.featuredImage?.node?.sourceUrl,
+            path: `${context.req.headers.host}/post/${node.slug}?cnt=${node.databaseId.toString()}`
+            // path: `https://foreverloveanimal.vercel.app/post/${node.slug}?cnt=${node.databaseId.toString()}`
+          }
+        })
+      }
     }
   }
-}

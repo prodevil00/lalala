@@ -58,14 +58,7 @@
 }
 
 .grid {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
   width: 100%;
-  list-style: none;
-  margin-top: 3rem;
-  padding: 0;
 }
 
 .card {
@@ -121,9 +114,15 @@
   font-size: 1.4em;
 }
 
+.content figure{
+  width: unset !important;
+}
+
 .content img{
   width: 100%;
 }
+
+
 
 .backToHome {
   width: 100%;
