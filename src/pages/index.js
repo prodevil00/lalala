@@ -57,7 +57,7 @@ export default function Posts({posts}){
 export async function getServerSideProps(context){
     const { data } = await client.query({
       query: gql`{
-        posts(first: 1000) {
+        posts(first: 100000) {
             edges {
               node {
                 id
